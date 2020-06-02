@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/tarm/serial"
 )
@@ -18,7 +19,7 @@ type Listener struct {
 	name string
 }
 
-//Writing func
+//Writing to a port
 func (w Writer) Writing(text string) {
 	writer := &serial.Config{Name: w.name, Baud: 115200}
 	sw, err := serial.OpenPort(writer)
@@ -43,18 +44,17 @@ func (l Listener) Listening() []string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var texts []string
-	texts = append(texts, string(buf[:n]))
+	texts := Separate(string(buf[:n]))
 	return texts
 }
 
 //Separate a text
-func Separate(text string) []string {
-	return nil
+func Separate(t string) []string {
+	return strings.SplitAfter(t, "O75")
 }
 
 //Meeting .
-func Meeting(l Listener, w Writer) {
+func Meeting(l Listener, w Writer) []string {
 
 	w.Writing(w.name)
 	fmt.Println("Esperando...")
@@ -65,7 +65,7 @@ func Meeting(l Listener, w Writer) {
 		fmt.Println(texts[1] + " es el arbitro")
 		w.Writing(texts[1])
 	}
-
+	return texts
 }
 
 func main() {
@@ -74,6 +74,8 @@ func main() {
 		listener := Listener{l}
 		w := os.Args[2]
 		writer := Writer{w}
+		// 	//data:=
 		Meeting(listener, writer)
 	}
+	fmt.Print(strings.TrimSuffix(strings.TrimPrefix("B1V1Hello, GophersU75O75", "B1"), "O75"))
 }
