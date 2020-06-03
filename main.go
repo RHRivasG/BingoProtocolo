@@ -12,35 +12,44 @@ import (
 //Writer struct
 type Writer struct {
 	name string
+	sw   *serial.Port
 }
 
 //Listener struct
 type Listener struct {
 	name string
+	sl   *serial.Port
+}
+
+//NewWriter .
+func NewWriter(name string) Writer {
+	w := &serial.Config{Name: name, Baud: 115200}
+	sw, err := serial.OpenPort(w)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return Writer{name, sw}
+}
+
+//NewListener .
+func NewListener(name string) Listener {
+	l := &serial.Config{Name: name, Baud: 115200}
+	sl, err := serial.OpenPort(l)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return Listener{name, sl}
 }
 
 //Writing to a port
-func (w Writer) Writing(text string) {
-	writer := &serial.Config{Name: w.name, Baud: 115200}
-	sw, err := serial.OpenPort(writer)
-	if err != nil {
-		log.Fatal(err)
-	}
-	sw.Write([]byte(text))
-	if err != nil {
-		log.Fatal(err)
-	}
+func (w *Writer) Writing(text string) {
+	(w.sw).Write([]byte(text))
 }
 
 //Listening a port
-func (l Listener) Listening() []string {
-	listener := &serial.Config{Name: l.name, Baud: 115200}
-	sl, err := serial.OpenPort(listener)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (l *Listener) Listening() []string {
 	buf := make([]byte, 128)
-	n, err := sl.Read(buf)
+	n, err := (l.sl).Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,21 +68,20 @@ func Meeting(l Listener, w Writer) []string {
 	w.Writing(w.name)
 	fmt.Println("Esperando...")
 	texts := l.Listening()
-	if texts[1] == w.name {
+	if texts[0] == w.name {
 		fmt.Println("Yo soy el arbitro")
 	} else {
-		fmt.Println(texts[1] + " es el arbitro")
-		w.Writing(texts[1])
+		fmt.Println(texts[0] + " es el arbitro")
+		w.Writing(texts[0])
 	}
-	return texts
+
+	return nil
 }
 
 func main() {
 	if os.Args[1:] != nil {
-		l := os.Args[1]
-		listener := Listener{l}
-		w := os.Args[2]
-		writer := Writer{w}
+		listener := NewListener(os.Args[1])
+		writer := NewWriter(os.Args[2])
 		// 	//data:=
 		Meeting(listener, writer)
 	}
