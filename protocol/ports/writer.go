@@ -25,5 +25,5 @@ func NewWriter(name string) Writer {
 
 //Writing to a port
 func (w *Writer) Writing(messages []string) {
-	(w.sw).Write([]byte(message.Unite(message.PutPutLimiter(messages))))
+	(w.sw).Write([]byte(message.Unite(message.PutLimiter(messages))))
 }
