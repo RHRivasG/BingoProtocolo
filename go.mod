@@ -1,4 +1,4 @@
-module bingo-protocolo
+module serialport-protocol
 
 go 1.14
 
