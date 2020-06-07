@@ -2,6 +2,7 @@ package ports
 
 import (
 	"log"
+	message "serialport-protocol/protocol"
 
 	"github.com/tarm/serial"
 )
@@ -23,6 +24,6 @@ func NewWriter(name string) Writer {
 }
 
 //Writing to a port
-func (w *Writer) Writing(message string) {
-	(w.sw).Write([]byte(message))
+func (w *Writer) Writing(messages []string) {
+	(w.sw).Write([]byte(message.Unite(message.PutPutLimiter(messages))))
 }

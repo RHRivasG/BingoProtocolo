@@ -2,6 +2,7 @@ package ports
 
 import (
 	"log"
+	message "serialport-protocol/protocol"
 
 	"github.com/tarm/serial"
 )
@@ -29,6 +30,6 @@ func (l *Listener) Listening() []string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	messages := CutLimiter(Separate(string(buf[:n])))
+	messages := message.CutLimiter(message.Separate(string(buf[:n])))
 	return messages
 }
