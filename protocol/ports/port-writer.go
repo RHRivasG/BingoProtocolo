@@ -2,16 +2,17 @@ package ports
 
 import (
 	"log"
-	message "serialport-protocol/protocol"
 
 	"github.com/tarm/serial"
 )
 
+//Writer .
 type Writer struct {
 	name string
 	sw   *serial.Port
 }
 
+//NewWriter .
 func NewWriter(name string) Writer {
 	w := &serial.Config{Name: name, Baud: 115200}
 	sw, err := serial.OpenPort(w)
@@ -21,13 +22,32 @@ func NewWriter(name string) Writer {
 	return Writer{name, sw}
 }
 
+//GetName .
 func (w *Writer) GetName() string {
 	return w.name
 }
+
+//GetSerialPort .
 func (w *Writer) GetSerialPort() *serial.Port {
 	return w.sw
 }
 
+//Writing .
 func (w *Writer) Writing(messages []string) {
-	(w.sw).Write([]byte(message.Unite(message.PutLimiter(messages))))
+	(w.sw).Write([]byte(unite(putLimiter(messages))))
+}
+
+func putLimiter(m []string) []string {
+	var messages []string
+	for _, message := range m {
+		messages = append(messages, "B1"+message+"O75")
+	}
+	return messages
+}
+func unite(m []string) string {
+	var messages string
+	for _, message := range m {
+		messages += message
+	}
+	return messages
 }
