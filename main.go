@@ -1,22 +1,25 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"serialport-protocol/protocol"
-	port "serialport-protocol/protocol/ports"
 )
 
 func main() {
 	if os.Args[1:] != nil {
-		// 	listener := NewListener(os.Args[1])
-		// 	writer := NewWriter(os.Args[2])
-		// 	// 	//data:=
-		// 	Meeting(listener, writer)
-		listener := port.NewListener(os.Args[1])
-		writer := port.NewWriter(os.Args[2])
+		protocol := protocol.NewProtocol(os.Args[1], os.Args[2])
 		var arbitro []string
 		arbitro = append(arbitro, os.Args[2])
-		messages := protocol.Converse(writer, listener, arbitro)
+		messages := protocol.Converse(arbitro)
+		if messages[0] == protocol.GetWriterName() {
+			fmt.Println("Yo soy el arbitro")
+		} else {
+			fmt.Println(messages[0] + " es el arbitro")
+			protocol.EndConversation(messages)
+		}
 
+	} else {
+		fmt.Println("No hay argumentos")
 	}
 }
