@@ -1,7 +1,6 @@
 package ports
 
 import (
-	"log"
 	"strings"
 
 	"github.com/tarm/serial"
@@ -14,24 +13,24 @@ type Listener struct {
 }
 
 //NewListener .
-func NewListener(name string) Listener {
+func NewListener(name string) (Listener, error) {
 	l := &serial.Config{Name: name, Baud: 115200}
 	sl, err := serial.OpenPort(l)
 	if err != nil {
-		log.Fatal(err)
+		return Listener{}, err
 	}
-	return Listener{name, sl}
+	return Listener{name, sl}, nil
 }
 
 //Listening .
-func (l *Listener) Listening() []string {
+func (l *Listener) Listening() ([]string, error) {
 	buf := make([]byte, 128)
 	n, err := (l.sl).Read(buf)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	messages := cutLimiter(separate(string(buf[:n])))
-	return messages
+	return messages, nil
 }
 
 func cutIndexAndSuffix(t string) string {

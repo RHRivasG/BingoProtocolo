@@ -1,8 +1,6 @@
 package ports
 
 import (
-	"log"
-
 	"github.com/tarm/serial"
 )
 
@@ -13,13 +11,13 @@ type Writer struct {
 }
 
 //NewWriter .
-func NewWriter(name string) Writer {
+func NewWriter(name string) (Writer, error) {
 	w := &serial.Config{Name: name, Baud: 115200}
 	sw, err := serial.OpenPort(w)
 	if err != nil {
-		log.Fatal(err)
+		return Writer{}, err
 	}
-	return Writer{name, sw}
+	return Writer{name, sw}, nil
 }
 
 //GetName .
